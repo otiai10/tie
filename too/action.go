@@ -6,11 +6,8 @@ import "github.com/urfave/cli"
 func MainAction(ctx *cli.Context) error {
 
 	builder := NewBuilder()
-	for {
-		if err := builder.Accept(); err != nil {
-			return err
-		}
-		break
+	if err := builder.Accept(); err != nil {
+		return err
 	}
 	commands, err := builder.Build()
 	if err != nil {
