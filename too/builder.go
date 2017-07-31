@@ -1,0 +1,51 @@
+package too
+
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"strings"
+
+	"github.com/fatih/color"
+)
+
+var colors = []color.Attribute{
+	color.FgGreen,
+	color.FgCyan,
+}
+
+const prompt = "> "
+
+// Builder ...
+type Builder struct {
+	commands []*Command
+}
+
+// NewBuilder ...
+func NewBuilder() *Builder {
+	return new(Builder)
+}
+
+// Accept ...
+func (b *Builder) Accept() error {
+	scanner := bufio.NewScanner(os.Stdin)
+	fmt.Print(prompt)
+	for scanner.Scan() {
+		line := strings.Trim(scanner.Text(), " ")
+		if line == "" {
+			return nil
+		}
+		cmd, err := NewCommand(line, len(b.commands), color.New(colors[len(b.commands)%len(colors)]))
+		if err != nil {
+			return err
+		}
+		b.commands = append(b.commands, cmd)
+		fmt.Print(prompt)
+	}
+	return nil
+}
+
+// Build ...
+func (b *Builder) Build() ([]*Command, error) {
+	return b.commands, nil
+}
