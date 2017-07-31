@@ -8,6 +8,13 @@ the opposite of `tee`.
                      └─ stdout/stderr/SIGINT to kill both
 ```
 
+# install
+
+```sh
+% go get github.com/otiai10/too
+# then just hit `too`
+```
+
 # why?
 
 When you need to start 2 file watchers, and kill them by 1 signal, like this.
