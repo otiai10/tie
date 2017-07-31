@@ -35,13 +35,21 @@ func (b *Builder) Accept() error {
 		if line == "" {
 			return nil
 		}
-		cmd, err := NewCommand(line, len(b.commands), color.New(colors[len(b.commands)%len(colors)]))
-		if err != nil {
+		if err := b.Add(line); err != nil {
 			return err
 		}
-		b.commands = append(b.commands, cmd)
 		fmt.Print(prompt)
 	}
+	return nil
+}
+
+// Add ...
+func (b *Builder) Add(line string) error {
+	cmd, err := NewCommand(line, len(b.commands), color.New(colors[len(b.commands)%len(colors)]))
+	if err != nil {
+		return err
+	}
+	b.commands = append(b.commands, cmd)
 	return nil
 }
 
