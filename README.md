@@ -17,7 +17,7 @@ the opposite of `tee`.
 
 # why?
 
-When you need to start 2 file watchers, and kill them by 1 signal, like this.
+When you need to start 2 file watchers, and kill them at the same time, like this
 
 ```sh
 % nohup rails server &
