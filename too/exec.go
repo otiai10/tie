@@ -22,7 +22,7 @@ func start(c *Command, end chan bool) error {
 	scout := bufio.NewScanner(stdout)
 	go func() {
 		for scout.Scan() {
-			c.Color.Printf("[%d]\t", c.Index)
+			c.PrintHeader()
 			fmt.Println(scout.Text())
 		}
 		stdout.Close()
@@ -32,7 +32,7 @@ func start(c *Command, end chan bool) error {
 	scerr := bufio.NewScanner(stderr)
 	go func() {
 		for scerr.Scan() {
-			c.Color.Printf("[%d]\t", c.Index)
+			c.PrintHeader()
 			fmt.Println(scerr.Text())
 		}
 		stderr.Close()
