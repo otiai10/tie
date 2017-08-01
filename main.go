@@ -14,6 +14,7 @@ func main() {
 	app.Usage = "too"
 	app.Description = too.Description
 	app.Action = too.MainAction
+	app.Flags = []cli.Flag{too.FlagCommand}
 	if err := app.Run(os.Args); err != nil {
 		log.Fatal(err.Error())
 	}
