@@ -2,7 +2,9 @@ package too
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
+	"regexp"
 	"strings"
 
 	"github.com/fatih/color"
@@ -26,13 +28,29 @@ func NewCommand(line string, index int, col *color.Color) (*Command, error) {
 	if len(q) == 0 {
 		return nil, fmt.Errorf("invalid line")
 	}
-	c.Prefix = q[0]
+	envs, spell := parseWords(q)
+	c.Prefix = spell[0]
 	if len(q) > 1 {
-		c.Cmd = exec.Command(q[0], q[1:]...)
+		c.Cmd = exec.Command(spell[0], spell[1:]...)
 	} else {
-		c.Cmd = exec.Command(q[0])
+		c.Cmd = exec.Command(spell[0])
 	}
+	c.Env = append(os.Environ(), envs...)
 	return c, nil
+}
+
+func parseWords(words []string) ([]string, []string) {
+	exp := regexp.MustCompile("^[^=]+=[^=]+$")
+	envs := []string{}
+	spell := []string{}
+	for _, word := range words {
+		if exp.MatchString(word) {
+			envs = append(envs, word)
+		} else {
+			spell = append(spell, word)
+		}
+	}
+	return envs, spell
 }
 
 // PrintHeader ...
