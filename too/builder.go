@@ -3,6 +3,7 @@ package too
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 
@@ -19,11 +20,14 @@ const prompt = "> "
 // Builder ...
 type Builder struct {
 	commands []*Command
+	stdout   io.Writer
 }
 
 // NewBuilder ...
-func NewBuilder() *Builder {
-	return new(Builder)
+func NewBuilder(writer io.Writer) *Builder {
+	return &Builder{
+		stdout: writer,
+	}
 }
 
 // Accept ...
@@ -45,7 +49,7 @@ func (b *Builder) Accept() error {
 
 // Add ...
 func (b *Builder) Add(line string) error {
-	cmd, err := NewCommand(line, len(b.commands), color.New(colors[len(b.commands)%len(colors)]))
+	cmd, err := NewCommand(b.stdout, line, len(b.commands), color.New(colors[len(b.commands)%len(colors)]))
 	if err != nil {
 		return err
 	}

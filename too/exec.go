@@ -14,16 +14,22 @@ func start(c *Command, end chan bool) error {
 	if err != nil {
 		return err
 	}
+
 	stderr, err := c.StderrPipe()
 	if err != nil {
 		return err
+	}
+
+	output := c.stdout
+	if output == nil {
+		output = os.Stdout
 	}
 
 	scout := bufio.NewScanner(stdout)
 	go func() {
 		for scout.Scan() {
 			c.PrintHeader()
-			fmt.Println(scout.Text())
+			c.PrintLine(scout.Text())
 		}
 		stdout.Close()
 		end <- true
@@ -33,7 +39,7 @@ func start(c *Command, end chan bool) error {
 	go func() {
 		for scerr.Scan() {
 			c.PrintHeader()
-			fmt.Println(scerr.Text())
+			c.PrintLine(scout.Text())
 		}
 		stderr.Close()
 		// end <- true
@@ -75,11 +81,13 @@ func Exec(commands ...*Command) error {
 			if len(errors) != 0 {
 				fmt.Println(errors)
 			}
-			os.Exit(0) // TODO
+			// os.Exit(0)
+			break
 		case _ = <-endups:
 			endcnt++
 			if endcnt >= len(commands) {
-				os.Exit(0)
+				// os.Exit(0)
+				return nil
 			}
 		}
 	}

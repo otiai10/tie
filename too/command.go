@@ -2,6 +2,7 @@ package too
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"regexp"
@@ -12,6 +13,7 @@ import (
 
 // Command ...
 type Command struct {
+	stdout io.Writer
 	Color  *color.Color
 	Index  int
 	Prefix string
@@ -19,10 +21,11 @@ type Command struct {
 }
 
 // NewCommand ...
-func NewCommand(line string, index int, col *color.Color) (*Command, error) {
+func NewCommand(stdout io.Writer, line string, index int, col *color.Color) (*Command, error) {
 	c := &Command{
-		Index: index,
-		Color: col,
+		stdout: stdout,
+		Index:  index,
+		Color:  col,
 	}
 	q := strings.Split(line, " ")
 	if len(q) == 0 {
@@ -55,5 +58,18 @@ func parseWords(words []string) ([]string, []string) {
 
 // PrintHeader ...
 func (c *Command) PrintHeader() {
-	c.Color.Printf("[%d] %s\t", c.Index, c.Prefix)
+	out := c.stdout
+	if out == nil {
+		out = os.Stdout
+	}
+	c.Color.Fprintf(out, "[%d] %s\t", c.Index, c.Prefix)
+}
+
+// PrintLine ...
+func (c *Command) PrintLine(text string) {
+	out := c.stdout
+	if out == nil {
+		out = os.Stderr
+	}
+	c.Color.Fprintln(out, text)
 }

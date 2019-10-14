@@ -1,11 +1,13 @@
 package too
 
-import "github.com/urfave/cli"
+import (
+	"github.com/urfave/cli"
+)
 
 // MainAction ...
 func MainAction(ctx *cli.Context) error {
 
-	builder := NewBuilder()
+	builder := NewBuilder(ctx.App.Writer)
 
 	if cmds := ctx.StringSlice("cmd"); len(cmds) != 0 {
 		for _, cmdline := range cmds {
