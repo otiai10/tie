@@ -1,6 +1,7 @@
 # too
 
 [![CircleCI](https://circleci.com/gh/otiai10/too.svg?style=svg)](https://circleci.com/gh/otiai10/too)
+[![Go Report Card](https://goreportcard.com/badge/github.com/otiai10/too)](https://goreportcard.com/report/github.com/otiai10/too)
 
 The opposite of `tee`, merges multiple command io stream and controls like 1 command.
 
