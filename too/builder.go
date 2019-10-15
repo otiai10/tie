@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/fatih/color"
+	"github.com/otiai10/color"
 )
 
 var colors = []color.Attribute{
