@@ -20,11 +20,6 @@ func start(c *Command, end chan bool) error {
 		return err
 	}
 
-	output := c.stdout
-	if output == nil {
-		output = os.Stdout
-	}
-
 	scout := bufio.NewScanner(stdout)
 	go func() {
 		for scout.Scan() {
