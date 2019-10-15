@@ -8,24 +8,26 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/fatih/color"
+	"github.com/otiai10/color"
 )
 
 // Command ...
 type Command struct {
-	stdout io.Writer
-	Color  *color.Color
-	Index  int
-	Prefix string
+	stdout   io.Writer
+	Color    *color.Color
+	Index    int
+	Prefix   string
+	RawInput string
 	*exec.Cmd
 }
 
 // NewCommand ...
 func NewCommand(stdout io.Writer, line string, index int, col *color.Color) (*Command, error) {
 	c := &Command{
-		stdout: stdout,
-		Index:  index,
-		Color:  col,
+		stdout:   stdout,
+		Index:    index,
+		Color:    col,
+		RawInput: line,
 	}
 	q := strings.Split(line, " ")
 	if len(q) == 0 {
@@ -56,6 +58,17 @@ func parseWords(words []string) ([]string, []string) {
 	return envs, spell
 }
 
+// PrintIntroduction prints raw input with underline.
+func (c *Command) PrintIntroduction() {
+	out := c.stdout
+	if out == nil {
+		out = os.Stdout
+	}
+	withDecoration := c.Color.Clone()
+	withDecoration.Add(color.Underline)
+	withDecoration.Fprintf(out, "[%d] %s\n", c.Index, c.RawInput)
+}
+
 // PrintHeader ...
 func (c *Command) PrintHeader() {
 	out := c.stdout
@@ -71,5 +84,6 @@ func (c *Command) PrintLine(text string) {
 	if out == nil {
 		out = os.Stderr
 	}
-	c.Color.Fprintln(out, text)
+	fmt.Fprintln(out, text)
+	// c.Color.Fprintln(out, text)
 }

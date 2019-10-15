@@ -40,6 +40,8 @@ func start(c *Command, end chan bool) error {
 		// end <- true
 	}()
 
+	c.PrintIntroduction()
+
 	if err := c.Start(); err != nil {
 		stdout.Close()
 		stderr.Close()
