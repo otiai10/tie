@@ -1,6 +1,7 @@
 package too
 
 import (
+	"bufio"
 	"fmt"
 	"io"
 	"os"
@@ -96,4 +97,49 @@ func (c *Command) PrintExitCode() {
 	}
 	c.Color.Fprintf(out, "[%d] %s\t", c.Index, c.Prefix)
 	fmt.Fprintf(out, "exit code %d\n", c.Cmd.ProcessState.ExitCode())
+}
+
+// Start ...
+func (c *Command) Start(end chan *Command) error {
+
+	stdout, err := c.StdoutPipe()
+	if err != nil {
+		return err
+	}
+
+	stderr, err := c.StderrPipe()
+	if err != nil {
+		return err
+	}
+
+	scout := bufio.NewScanner(stdout)
+	go func() {
+		for scout.Scan() {
+			c.PrintHeader()
+			c.PrintLine(scout.Text())
+		}
+		stdout.Close()
+		end <- c
+	}()
+
+	scerr := bufio.NewScanner(stderr)
+	go func() {
+		for scerr.Scan() {
+			c.PrintHeader()
+			c.PrintLine(scerr.Text())
+		}
+		stderr.Close()
+		// end <- true
+	}()
+
+	c.PrintIntroduction()
+
+	if err := c.Cmd.Start(); err != nil {
+		stdout.Close()
+		stderr.Close()
+		return err
+	}
+
+	return nil
+
 }

@@ -1,55 +1,10 @@
 package too
 
 import (
-	"bufio"
 	"fmt"
 	"os"
 	"os/signal"
 )
-
-// start 1 command and notify when it ends by the channel provided.
-func start(c *Command, end chan *Command) error {
-
-	stdout, err := c.StdoutPipe()
-	if err != nil {
-		return err
-	}
-
-	stderr, err := c.StderrPipe()
-	if err != nil {
-		return err
-	}
-
-	scout := bufio.NewScanner(stdout)
-	go func() {
-		for scout.Scan() {
-			c.PrintHeader()
-			c.PrintLine(scout.Text())
-		}
-		stdout.Close()
-		end <- c
-	}()
-
-	scerr := bufio.NewScanner(stderr)
-	go func() {
-		for scerr.Scan() {
-			c.PrintHeader()
-			c.PrintLine(scerr.Text())
-		}
-		stderr.Close()
-		// end <- true
-	}()
-
-	c.PrintIntroduction()
-
-	if err := c.Start(); err != nil {
-		stdout.Close()
-		stderr.Close()
-		return err
-	}
-
-	return nil
-}
 
 // Exec ...
 func Exec(commands ...*Command) error {
@@ -61,7 +16,7 @@ func Exec(commands ...*Command) error {
 	endcnt := 0
 
 	for _, c := range commands {
-		if err := start(c, endups); err != nil {
+		if err := c.Start(endups); err != nil {
 			return err
 		}
 	}
