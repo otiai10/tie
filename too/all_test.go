@@ -87,16 +87,15 @@ func TestExec(t *testing.T) {
 	cmd2 := NewCommand("sleep 10", 1, color.New(color.FgGreen))
 	res := make(chan error)
 	go func() {
-		err := Exec(output, cmd1, cmd2)
-		time.Sleep(500 * time.Millisecond)
-		res <- err
+		res <- Exec(output, cmd1, cmd2)
 	}()
 	go func() {
 		for {
-			if cmd2.Cmd.Process != nil {
+			if cmd1.Cmd.Process != nil && cmd2.Cmd.Process != nil {
 				break
 			}
 		}
+		time.Sleep(2 * time.Second)
 		syscall.Kill(syscall.Getpid(), syscall.SIGINT)
 	}()
 	err := <-res
