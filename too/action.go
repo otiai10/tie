@@ -7,7 +7,7 @@ import (
 // MainAction ...
 func MainAction(ctx *cli.Context) error {
 
-	builder := NewBuilder(ctx.App.Writer)
+	builder := NewBuilder()
 
 	if cmds := ctx.StringSlice("cmd"); len(cmds) != 0 {
 		for _, cmdline := range cmds {
@@ -25,7 +25,11 @@ func MainAction(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	if err := Exec(commands...); err != nil {
+	for _, c := range commands {
+		c.Introduction().Print(ctx.App.Writer)
+	}
+
+	if err := Exec(ctx.App.Writer, commands...); err != nil {
 		return err
 	}
 	return nil

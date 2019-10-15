@@ -23,9 +23,8 @@ type Command struct {
 }
 
 // NewCommand ...
-func NewCommand(stdout io.Writer, line string, index int, col *color.Color) (*Command, error) {
+func NewCommand(line string, index int, col *color.Color) (*Command, error) {
 	c := &Command{
-		stdout:   stdout,
 		Index:    index,
 		Color:    col,
 		RawInput: line,
@@ -59,48 +58,8 @@ func parseWords(words []string) ([]string, []string) {
 	return envs, spell
 }
 
-// PrintIntroduction prints raw input with underline.
-func (c *Command) PrintIntroduction() {
-	out := c.stdout
-	if out == nil {
-		out = os.Stdout
-	}
-	withDecoration := c.Color.Clone()
-	withDecoration.Add(color.Underline)
-	withDecoration.Fprintf(out, "[%d] %s\n", c.Index, c.RawInput)
-}
-
-// PrintHeader ...
-func (c *Command) PrintHeader() {
-	out := c.stdout
-	if out == nil {
-		out = os.Stdout
-	}
-	c.Color.Fprintf(out, "[%d] %s\t", c.Index, c.Prefix)
-}
-
-// PrintLine ...
-func (c *Command) PrintLine(text string) {
-	out := c.stdout
-	if out == nil {
-		out = os.Stderr
-	}
-	fmt.Fprintln(out, text)
-	// c.Color.Fprintln(out, text)
-}
-
-// PrintExitCode ...
-func (c *Command) PrintExitCode() {
-	out := c.stdout
-	if out == nil {
-		out = os.Stdout
-	}
-	c.Color.Fprintf(out, "[%d] %s\t", c.Index, c.Prefix)
-	fmt.Fprintf(out, "exit code %d\n", c.Cmd.ProcessState.ExitCode())
-}
-
 // Start ...
-func (c *Command) Start(end chan *Command) error {
+func (c *Command) Start(msg chan<- Message, end chan *Command) error {
 
 	stdout, err := c.StdoutPipe()
 	if err != nil {
@@ -112,27 +71,22 @@ func (c *Command) Start(end chan *Command) error {
 		return err
 	}
 
-	scout := bufio.NewScanner(stdout)
 	go func() {
-		for scout.Scan() {
-			c.PrintHeader()
-			c.PrintLine(scout.Text())
+		scanout := bufio.NewScanner(stdout)
+		for scanout.Scan() {
+			msg <- c.message(Stdout, scanout.Text())
 		}
 		stdout.Close()
 		end <- c
 	}()
 
-	scerr := bufio.NewScanner(stderr)
 	go func() {
-		for scerr.Scan() {
-			c.PrintHeader()
-			c.PrintLine(scerr.Text())
+		scanerr := bufio.NewScanner(stderr)
+		for scanerr.Scan() {
+			msg <- c.message(Stderr, scanerr.Text())
 		}
 		stderr.Close()
-		// end <- true
 	}()
-
-	c.PrintIntroduction()
 
 	if err := c.Cmd.Start(); err != nil {
 		stdout.Close()
@@ -142,4 +96,29 @@ func (c *Command) Start(end chan *Command) error {
 
 	return nil
 
+}
+
+// Introduction prints raw input with underline.
+func (c *Command) Introduction() Message {
+	withDecoration := c.Color.Clone()
+	withDecoration.Add(color.Underline)
+	return Message{
+		Output: Stderr,
+		Color:  withDecoration,
+		Header: fmt.Sprintf("[%d] %s", c.Index, c.RawInput),
+	}
+}
+
+// ExitCode ...
+func (c *Command) ExitCode() Message {
+	return c.message(Stderr, fmt.Sprintf("exit code %d", c.Cmd.ProcessState.ExitCode()))
+}
+
+func (c *Command) message(out Output, text string) Message {
+	return Message{
+		Output: out,
+		Color:  c.Color,
+		Header: fmt.Sprintf("[%d] %s\t", c.Index, c.Prefix),
+		Text:   text,
+	}
 }
