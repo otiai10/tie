@@ -7,8 +7,8 @@ import (
 	"os/signal"
 )
 
-// start ...
-func start(c *Command, end chan bool) error {
+// start 1 command and notify when it ends by the channel provided.
+func start(c *Command, end chan *Command) error {
 
 	stdout, err := c.StdoutPipe()
 	if err != nil {
@@ -27,14 +27,14 @@ func start(c *Command, end chan bool) error {
 			c.PrintLine(scout.Text())
 		}
 		stdout.Close()
-		end <- true
+		end <- c
 	}()
 
 	scerr := bufio.NewScanner(stderr)
 	go func() {
 		for scerr.Scan() {
 			c.PrintHeader()
-			c.PrintLine(scout.Text())
+			c.PrintLine(scerr.Text())
 		}
 		stderr.Close()
 		// end <- true
@@ -57,7 +57,7 @@ func Exec(commands ...*Command) error {
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
 
-	endups := make(chan bool)
+	endups := make(chan *Command)
 	endcnt := 0
 
 	for _, c := range commands {
@@ -80,10 +80,11 @@ func Exec(commands ...*Command) error {
 			}
 			// os.Exit(0)
 			break
-		case _ = <-endups:
+		case c := <-endups:
 			endcnt++
+			c.Wait()
+			c.PrintExitCode()
 			if endcnt >= len(commands) {
-				// os.Exit(0)
 				return nil
 			}
 		}

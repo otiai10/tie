@@ -87,3 +87,13 @@ func (c *Command) PrintLine(text string) {
 	fmt.Fprintln(out, text)
 	// c.Color.Fprintln(out, text)
 }
+
+// PrintExitCode ...
+func (c *Command) PrintExitCode() {
+	out := c.stdout
+	if out == nil {
+		out = os.Stdout
+	}
+	c.Color.Fprintf(out, "[%d] %s\t", c.Index, c.Prefix)
+	fmt.Fprintf(out, "exit code %d\n", c.Cmd.ProcessState.ExitCode())
+}
