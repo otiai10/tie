@@ -1,6 +1,8 @@
 # too
 
-the opposite of `tee`.
+[![CircleCI](https://circleci.com/gh/otiai10/too.svg?style=svg)](https://circleci.com/gh/otiai10/too)
+
+The opposite of `tee`, merges multiple command io stream and controls like 1 command.
 
 ```
 -> command 1 stream ─┐
@@ -11,7 +13,7 @@ the opposite of `tee`.
 # install
 
 ```sh
-% go get github.com/otiai10/too
+% go get -u github.com/otiai10/too
 # then just hit `too`
 ```
 
