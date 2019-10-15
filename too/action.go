@@ -1,19 +1,22 @@
 package too
 
 import (
+	"io"
+
 	"github.com/urfave/cli"
 )
 
 // MainAction ...
-func MainAction(ctx *cli.Context) error {
+func MainAction(ctx *cli.Context, stdin io.Reader) error {
 
-	builder := NewBuilder()
+	builder := NewBuilder(stdin)
 
 	if cmds := ctx.StringSlice("cmd"); len(cmds) != 0 {
 		for _, cmdline := range cmds {
-			if err := builder.Add(cmdline); err != nil {
-				return err
-			}
+			builder.Add(cmdline)
+			// if err := builder.Add(cmdline); err != nil {
+			// 	return err
+			// }
 		}
 	} else {
 		if err := builder.Accept(); err != nil {
@@ -21,10 +24,7 @@ func MainAction(ctx *cli.Context) error {
 		}
 	}
 
-	commands, err := builder.Build()
-	if err != nil {
-		return err
-	}
+	commands := builder.Build()
 	for _, c := range commands {
 		c.Introduction().Print(ctx.App.Writer)
 	}

@@ -1,6 +1,10 @@
 package too
 
-import "github.com/urfave/cli"
+import (
+	"os"
+
+	"github.com/urfave/cli"
+)
 
 // NewApp ...
 func NewApp() *cli.App {
@@ -8,7 +12,9 @@ func NewApp() *cli.App {
 	app.Name = "too"
 	app.Usage = "too"
 	app.Description = Description
-	app.Action = MainAction
+	app.Action = func(ctx *cli.Context) {
+		MainAction(ctx, os.Stdin)
+	}
 	app.Flags = []cli.Flag{FlagCommand}
 	return app
 }

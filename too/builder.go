@@ -3,7 +3,7 @@ package too
 import (
 	"bufio"
 	"fmt"
-	"os"
+	"io"
 	"strings"
 
 	"github.com/otiai10/color"
@@ -21,41 +21,40 @@ const prompt = "> "
 // Builder ...
 type Builder struct {
 	commands []*Command
+	stdin    io.Reader
 }
 
 // NewBuilder ...
-func NewBuilder() *Builder {
-	return &Builder{}
+func NewBuilder(stdin io.Reader) *Builder {
+	return &Builder{
+		stdin: stdin,
+	}
 }
 
 // Accept ...
 func (b *Builder) Accept() error {
-	scanner := bufio.NewScanner(os.Stdin)
+	scanner := bufio.NewScanner(b.stdin)
 	fmt.Print(prompt)
 	for scanner.Scan() {
 		line := strings.Trim(scanner.Text(), " ")
 		if line == "" {
-			return nil
+			break
 		}
-		if err := b.Add(line); err != nil {
-			return err
-		}
+		b.Add(line)
 		fmt.Print(prompt)
 	}
-	return nil
+	return scanner.Err()
 }
 
 // Add ...
 func (b *Builder) Add(line string) error {
-	cmd, err := NewCommand(line, len(b.commands), color.New(colors[len(b.commands)%len(colors)]))
-	if err != nil {
-		return err
-	}
+	cmd := NewCommand(line, len(b.commands), color.New(colors[len(b.commands)%len(colors)]))
 	b.commands = append(b.commands, cmd)
 	return nil
 }
 
 // Build ...
-func (b *Builder) Build() ([]*Command, error) {
-	return b.commands, nil
+func (b *Builder) Build() []*Command {
+	// return b.commands, nil
+	return b.commands
 }

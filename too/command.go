@@ -23,16 +23,16 @@ type Command struct {
 }
 
 // NewCommand ...
-func NewCommand(line string, index int, col *color.Color) (*Command, error) {
+func NewCommand(line string, index int, col *color.Color) *Command {
 	c := &Command{
 		Index:    index,
 		Color:    col,
 		RawInput: line,
 	}
 	q := strings.Split(line, " ")
-	if len(q) == 0 {
-		return nil, fmt.Errorf("invalid line")
-	}
+	// if len(q) == 0 {
+	// 	return nil, fmt.Errorf("invalid line")
+	// }
 	envs, spell := parseWords(q)
 	c.Prefix = spell[0]
 	if len(q) > 1 {
@@ -41,7 +41,7 @@ func NewCommand(line string, index int, col *color.Color) (*Command, error) {
 		c.Cmd = exec.Command(spell[0])
 	}
 	c.Env = append(os.Environ(), envs...)
-	return c, nil
+	return c
 }
 
 func parseWords(words []string) ([]string, []string) {

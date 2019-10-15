@@ -11,7 +11,7 @@ import (
 func Exec(output io.Writer, commands ...*Command) error {
 
 	interrupt := make(chan os.Signal, 1)
-	defer close(interrupt)
+	// defer close(interrupt)
 	signal.Notify(interrupt, os.Interrupt)
 
 	endups := make(chan *Command)
@@ -37,7 +37,7 @@ func Exec(output io.Writer, commands ...*Command) error {
 		case _ = <-interrupt:
 			errors := []error{}
 			for _, c := range commands {
-				if c.Process.Pid < 0 {
+				if c.ProcessState != nil && c.ProcessState.Exited() {
 					// This process is already released
 					continue
 				}
