@@ -86,6 +86,7 @@ func TestExec(t *testing.T) {
 	cmd1 := NewCommand("echo foobaa", 0, color.New(color.FgCyan))
 	cmd2 := NewCommand("sleep 10", 1, color.New(color.FgGreen))
 	res := make(chan error)
+	defer close(res)
 	go func() {
 		res <- Exec(output, cmd1, cmd2)
 	}()
@@ -99,7 +100,7 @@ func TestExec(t *testing.T) {
 		syscall.Kill(syscall.Getpid(), syscall.SIGINT)
 	}()
 	err := <-res
-	Expect(t, err).ToBe(nil)
+	Expect(t, err).Not().ToBe(nil)
 	Expect(t, output.String()).Match("\\[0\\] echo	exit code 0")
 	Expect(t, output.String()).Match("\\[1\\] sleep	exit code -1")
 }

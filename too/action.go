@@ -2,6 +2,7 @@ package too
 
 import (
 	"io"
+	"os"
 
 	"github.com/urfave/cli"
 )
@@ -29,9 +30,11 @@ func MainAction(ctx *cli.Context, stdin io.Reader) error {
 		c.Introduction().Print(ctx.App.Writer)
 	}
 
-	if err := Exec(ctx.App.Writer, commands...); err != nil {
-		return err
+	err := Exec(ctx.App.Writer, commands...)
+	if _, ok := err.(ErrorInterrupted); ok {
+		os.Exit(130)
 	}
-	return nil
+
+	return err
 
 }

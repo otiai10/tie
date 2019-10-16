@@ -15,9 +15,6 @@ const (
 	Stdout Output = iota + 1
 	// Stderr ...
 	Stderr
-
-	// AppEnd ...
-	AppEnd = -1
 )
 
 // Message ...
@@ -27,6 +24,9 @@ type Message struct {
 	Header string
 	Text   string
 }
+
+// AppEnd ...
+var AppEnd = Message{Output: -1}
 
 // Print ...
 func (m Message) Print(out io.Writer) {

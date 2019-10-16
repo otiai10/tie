@@ -35,27 +35,24 @@ func Exec(output io.Writer, commands ...*Command) error {
 	for {
 		select {
 		case _ = <-interrupt:
-			errors := []error{}
+			errors := ErrorInterrupted{}
 			for _, c := range commands {
 				if c.ProcessState != nil && c.ProcessState.Exited() {
-					// This process is already released
 					continue
 				}
 				if err := c.Process.Kill(); err != nil {
-					errors = append(errors, err)
+					errors.Add(c.Prefix, err)
 				}
+				msg <- c.ExitCode()
 			}
-			if len(errors) != 0 {
-				fmt.Println(errors)
-			}
-			break
+			msg <- AppEnd
+			return errors
 		case c := <-endups:
 			endcnt++
 			c.Wait()
 			msg <- c.ExitCode()
 			if endcnt >= len(commands) {
-				// To make sure to print the last message
-				msg <- Message{Output: AppEnd}
+				msg <- AppEnd
 				return nil
 			}
 		}
@@ -65,14 +62,15 @@ func Exec(output io.Writer, commands ...*Command) error {
 func msgQueue(stdout, stderr io.Writer, msgchan chan Message) {
 	for {
 		m := <-msgchan
-		switch m.Output {
-		case AppEnd:
+		switch {
+		case m == AppEnd:
+			// To make sure to print the last message
 			close(msgchan)
 			return
-		case Stdout:
+		case m.Output == Stdout:
 			m.Color.Fprintf(stdout, m.Header)
 			fmt.Fprintf(stdout, "%s\n", m.Text)
-		case Stderr:
+		case m.Output == Stderr:
 			m.Color.Fprintf(stderr, m.Header)
 			fmt.Fprintf(stderr, "%s\n", m.Text)
 		}
