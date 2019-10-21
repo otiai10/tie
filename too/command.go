@@ -7,9 +7,9 @@ import (
 	"os"
 	"os/exec"
 	"regexp"
-	"strings"
 
 	"github.com/otiai10/color"
+	"github.com/otiai10/spell"
 )
 
 // Command ...
@@ -29,33 +29,26 @@ func NewCommand(line string, index int, col *color.Color) *Command {
 		Color:    col,
 		RawInput: line,
 	}
-	q := strings.Split(line, " ")
-	// if len(q) == 0 {
-	// 	return nil, fmt.Errorf("invalid line")
-	// }
-	envs, spell := parseWords(q)
-	c.Prefix = spell[0]
-	if len(q) > 1 {
-		c.Cmd = exec.Command(spell[0], spell[1:]...)
+
+	envexp := regexp.MustCompile("^[^=]+=[^=]+$")
+	var envs, spells []string
+	for _, token := range spell.Parse(line) {
+		if envexp.MatchString(token) {
+			envs = append(envs, token)
+		} else {
+			spells = append(spells, token)
+		}
+	}
+
+	c.Prefix = spells[0]
+
+	if len(spells) > 1 {
+		c.Cmd = exec.Command(spells[0], spells[1:]...)
 	} else {
-		c.Cmd = exec.Command(spell[0])
+		c.Cmd = exec.Command(spells[0])
 	}
 	c.Env = append(os.Environ(), envs...)
 	return c
-}
-
-func parseWords(words []string) ([]string, []string) {
-	exp := regexp.MustCompile("^[^=]+=[^=]+$")
-	envs := []string{}
-	spell := []string{}
-	for _, word := range words {
-		if exp.MatchString(word) {
-			envs = append(envs, word)
-		} else {
-			spell = append(spell, word)
-		}
-	}
-	return envs, spell
 }
 
 // Start ...
