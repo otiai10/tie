@@ -15,7 +15,7 @@ func Exec(output io.Writer, commands ...*Command) error {
 	signal.Notify(interrupt, os.Interrupt)
 
 	endups := make(chan *Command)
-	defer close(endups)
+	// defer close(endups)
 	endcnt := 0
 
 	stdout := output
