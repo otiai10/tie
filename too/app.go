@@ -15,6 +15,6 @@ func NewApp() *cli.App {
 	app.Action = func(ctx *cli.Context) {
 		MainAction(ctx, os.Stdin)
 	}
-	app.Flags = []cli.Flag{FlagCommand}
+	app.Flags = []cli.Flag{FlagCommand, FlagFile}
 	return app
 }

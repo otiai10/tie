@@ -19,6 +19,16 @@ func MainAction(ctx *cli.Context, stdin io.Reader) error {
 			// 	return err
 			// }
 		}
+	} else if fpath := ctx.String("f"); fpath != "" {
+		config, err := Parse(fpath)
+		if err != nil {
+			return err
+		}
+		for _, cmdline := range config.Commands {
+			if err := builder.Add(cmdline.Run); err != nil {
+				return err
+			}
+		}
 	} else {
 		if err := builder.Accept(); err != nil {
 			return err
