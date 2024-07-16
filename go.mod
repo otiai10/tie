@@ -16,5 +16,5 @@ require (
 	github.com/mattn/go-isatty v0.0.3 // indirect
 	github.com/russross/blackfriday/v2 v2.0.1 // indirect
 	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
-	golang.org/x/sys v0.0.0-20180202135801-37707fdb30a5 // indirect
+	golang.org/x/sys v0.1.0 // indirect
 )
