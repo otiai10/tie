@@ -1,8 +1,8 @@
-# too
+# tie
 
-[![Go](https://github.com/otiai10/too/actions/workflows/go.yml/badge.svg)](https://github.com/otiai10/too/actions/workflows/go.yml)
-[![codecov](https://codecov.io/gh/otiai10/too/branch/master/graph/badge.svg)](https://codecov.io/gh/otiai10/too)
-[![Go Report Card](https://goreportcard.com/badge/github.com/otiai10/too)](https://goreportcard.com/report/github.com/otiai10/too)
+[![Go](https://github.com/otiai10/tie/actions/workflows/go.yml/badge.svg)](https://github.com/otiai10/tie/actions/workflows/go.yml)
+[![codecov](https://codecov.io/gh/otiai10/tie/branch/master/graph/badge.svg)](https://codecov.io/gh/otiai10/tie)
+[![Go Report Card](https://goreportcard.com/badge/github.com/otiai10/tie)](https://goreportcard.com/report/github.com/otiai10/tie)
 
 The opposite of `tee`, merges multiple command io stream and controls like 1 command.
 
@@ -15,8 +15,8 @@ The opposite of `tee`, merges multiple command io stream and controls like 1 com
 # install
 
 ```sh
-% go get -u github.com/otiai10/too
-# then just hit `too`
+% go get -u github.com/otiai10/tie
+# then just hit `tie`
 ```
 
 # why?
@@ -35,7 +35,7 @@ When you need to start 2 file watchers, and kill them at the same time, like thi
 # usage
 
 ```sh
-% too
+% tie
 > rails server # return key
 > npm start-webpack # return key
 > # return key again

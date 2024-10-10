@@ -1,4 +1,4 @@
-package too
+package tie
 
 import (
 	"bufio"
@@ -15,7 +15,7 @@ import (
 
 func Test_MainAction(t *testing.T) {
 	app := NewApp()
-	set := flag.NewFlagSet("tootest", 0)
+	set := flag.NewFlagSet("tietest", 0)
 	set.Var(&cli.StringSlice{"echo foo", "echo baa"}, "cmd", "")
 	buf := bytes.NewBuffer(nil)
 	app.Writer = buf
@@ -30,7 +30,7 @@ func Test_MainAction(t *testing.T) {
 	Expect(t, buf.String()).Match("\\[1\\] echo\texit code 0\n")
 
 	When(t, "Some command exits with non-zero code", func(t *testing.T) {
-		set := flag.NewFlagSet("tootest", 0)
+		set := flag.NewFlagSet("tietest", 0)
 		set.Var(&cli.StringSlice{"echo foo", "cat non-existing"}, "cmd", "")
 		buf := bytes.NewBuffer(nil)
 		app.Writer = buf
@@ -44,7 +44,7 @@ func Test_MainAction(t *testing.T) {
 
 	When(t, "Any of cmd arguments are NOT given", func(t *testing.T) {
 		app := NewApp()
-		set := flag.NewFlagSet("tootest", 0)
+		set := flag.NewFlagSet("tietest", 0)
 		// set.Var(nil, "cmd", "")
 		inbuf := bytes.NewBuffer([]byte("echo hoge\necho fuga\n\n"))
 		outbuf := bytes.NewBuffer(nil)

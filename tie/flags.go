@@ -1,4 +1,4 @@
-package too
+package tie
 
 import "github.com/urfave/cli"
 

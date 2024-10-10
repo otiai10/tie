@@ -1,4 +1,4 @@
-package too
+package tie
 
 import (
 	"io"

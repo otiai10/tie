@@ -1,4 +1,4 @@
-module github.com/otiai10/too
+module github.com/otiai10/tie
 
 go 1.22
 

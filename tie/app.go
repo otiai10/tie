@@ -1,4 +1,4 @@
-package too
+package tie
 
 import (
 	"os"
@@ -9,8 +9,8 @@ import (
 // NewApp ...
 func NewApp() *cli.App {
 	app := cli.NewApp()
-	app.Name = "too"
-	app.Usage = "too"
+	app.Name = "tie"
+	app.Usage = "tie"
 	app.Description = Description
 	app.Action = func(ctx *cli.Context) {
 		MainAction(ctx, os.Stdin)
